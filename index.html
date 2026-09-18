@@ -1,17 +1,476 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>카운터</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>뽀모도로 타이머</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Malgun Gothic", sans-serif;
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  min-height: 100vh;
+  padding: 30px 20px;
+}
+
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.app-header h1 {
+  color: #4a2c2a;
+  font-size: 28px;
+  margin: 0;
+}
+
+.add-btn {
+  background: #e85d4d;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: transform 0.15s, background 0.2s;
+}
+
+.add-btn:hover {
+  background: #d64a3a;
+  transform: translateY(-2px);
+}
+
+.timer-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: flex-start;
+}
+
+.timer-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 22px;
+  width: 260px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transition: transform 0.2s;
+}
+
+.timer-card:hover {
+  transform: translateY(-3px);
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.timer-title {
+  flex: 1;
+  border: none;
+  background: #f7f2ef;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #4a2c2a;
+  outline: none;
+}
+
+.timer-title:focus {
+  background: #efe6e1;
+}
+
+.remove-btn {
+  border: none;
+  background: #f1f1f1;
+  color: #888;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.remove-btn:hover {
+  background: #ffdada;
+  color: #d33;
+}
+
+.mode-tabs {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.mode-btn {
+  flex: 1;
+  border: none;
+  background: #f2f2f2;
+  color: #666;
+  padding: 8px 4px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mode-btn.active {
+  background: #e85d4d;
+  color: #fff;
+  font-weight: 600;
+}
+
+.timer-display {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin-bottom: 18px;
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring__bg {
+  fill: none;
+  stroke: #f2e6e0;
+  stroke-width: 10;
+}
+
+.progress-ring__fg {
+  fill: none;
+  stroke: #e85d4d;
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 502.4;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.3s linear;
+}
+
+.time-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 180px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  font-weight: 700;
+  color: #4a2c2a;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.controls button {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+
+.start-btn {
+  background: #4caf7d;
+  color: #fff;
+}
+
+.pause-btn {
+  background: #f0ad4e;
+  color: #fff;
+}
+
+.reset-btn {
+  background: #e0e0e0;
+  color: #555;
+}
+
+.controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.session-info {
+  font-size: 13px;
+  color: #888;
+}
+
+.timer-card.running .progress-ring__fg {
+  stroke: #e85d4d;
+}
+
+.timer-card.short .progress-ring__fg,
+.timer-card.long .progress-ring__fg {
+  stroke: #4caf7d;
+}
+
+.timer-card.finished .time-text {
+  color: #e85d4d;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@media (max-width: 600px) {
+  .timer-card {
+    width: 100%;
+  }
+}
+
+</style>
 </head>
 <body>
-  <h1>카운터</h1>
-  <div id="count">0</div>
-  <button id="dec">- 1</button>
-  <button id="reset">Reset</button>
-  <button id="inc">+ 1</button>
+  <div class="app">
+    <header class="app-header">
+      <h1>🍅 뽀모도로 타이머</h1>
+      <button id="addTimerBtn" class="add-btn">+ 타이머 추가</button>
+    </header>
+    <div id="timerContainer" class="timer-container"></div>
+  </div>
 
-  <script src="script.js"></script>
+  <template id="timerTemplate">
+    <div class="timer-card">
+      <div class="card-top">
+        <input class="timer-title" type="text" value="뽀모도로">
+        <button class="remove-btn" title="삭제">✕</button>
+      </div>
+
+      <div class="mode-tabs">
+        <button class="mode-btn active" data-mode="focus" data-minutes="25">집중 25</button>
+        <button class="mode-btn" data-mode="short" data-minutes="5">짧은휴식 5</button>
+        <button class="mode-btn" data-mode="long" data-minutes="15">긴휴식 15</button>
+      </div>
+
+      <div class="timer-display">
+        <svg class="progress-ring" width="180" height="180">
+          <circle class="progress-ring__bg" cx="90" cy="90" r="80"></circle>
+          <circle class="progress-ring__fg" cx="90" cy="90" r="80"></circle>
+        </svg>
+        <div class="time-text">25:00</div>
+      </div>
+
+      <div class="controls">
+        <button class="start-btn">시작</button>
+        <button class="pause-btn" disabled>일시정지</button>
+        <button class="reset-btn">초기화</button>
+      </div>
+
+      <div class="session-info">
+        완료한 뽀모도로: <span class="session-count">0</span>개
+      </div>
+    </div>
+  </template>
+
+  <audio id="alarmSound" src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" preload="auto"></audio>
+
+  <script>
+// 뽀모도로 타이머 - Vanilla JS
+// 여러 개의 타이머 인스턴스를 동시에 생성하고 독립적으로 관리한다.
+
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('timerContainer');
+  const template = document.getElementById('timerTemplate');
+  const addBtn = document.getElementById('addTimerBtn');
+  const alarmSound = document.getElementById('alarmSound');
+
+  const CIRCLE_CIRCUMFERENCE = 2 * Math.PI * 80; // r=80
+
+  let timerCount = 0;
+
+  class PomodoroTimer {
+    constructor(id) {
+      this.id = id;
+      this.mode = 'focus';
+      this.minutes = 25;
+      this.totalSeconds = this.minutes * 60;
+      this.remainingSeconds = this.totalSeconds;
+      this.intervalId = null;
+      this.isRunning = false;
+      this.sessionCount = 0;
+
+      this._buildDom();
+      this._bindEvents();
+      this._updateDisplay();
+    }
+
+    _buildDom() {
+      const fragment = template.content.cloneNode(true);
+      this.el = fragment.querySelector('.timer-card');
+      this.el.dataset.id = this.id;
+
+      this.titleInput = this.el.querySelector('.timer-title');
+      this.removeBtn = this.el.querySelector('.remove-btn');
+      this.modeBtns = this.el.querySelectorAll('.mode-btn');
+      this.timeText = this.el.querySelector('.time-text');
+      this.progressRing = this.el.querySelector('.progress-ring__fg');
+      this.startBtn = this.el.querySelector('.start-btn');
+      this.pauseBtn = this.el.querySelector('.pause-btn');
+      this.resetBtn = this.el.querySelector('.reset-btn');
+      this.sessionCountEl = this.el.querySelector('.session-count');
+
+      this.progressRing.style.strokeDasharray = `${CIRCLE_CIRCUMFERENCE}`;
+      this.progressRing.style.strokeDashoffset = '0';
+
+      container.appendChild(this.el);
+    }
+
+    _bindEvents() {
+      this.removeBtn.addEventListener('click', () => this._destroy());
+
+      this.modeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (this.isRunning) return; // 실행 중에는 모드 변경 불가
+          this.modeBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          this.mode = btn.dataset.mode;
+          this.minutes = parseInt(btn.dataset.minutes, 10);
+          this.totalSeconds = this.minutes * 60;
+          this.remainingSeconds = this.totalSeconds;
+
+          this.el.classList.remove('short', 'long', 'finished');
+          if (this.mode === 'short' || this.mode === 'long') {
+            this.el.classList.add(this.mode);
+          }
+          this._updateDisplay();
+        });
+      });
+
+      this.startBtn.addEventListener('click', () => this._start());
+      this.pauseBtn.addEventListener('click', () => this._pause());
+      this.resetBtn.addEventListener('click', () => this._reset());
+    }
+
+    _start() {
+      if (this.isRunning) return;
+      this.isRunning = true;
+      this.el.classList.add('running');
+      this.el.classList.remove('finished');
+      this.startBtn.disabled = true;
+      this.pauseBtn.disabled = false;
+
+      this.intervalId = setInterval(() => {
+        this.remainingSeconds--;
+        this._updateDisplay();
+
+        if (this.remainingSeconds <= 0) {
+          this._finish();
+        }
+      }, 1000);
+    }
+
+    _pause() {
+      if (!this.isRunning) return;
+      this.isRunning = false;
+      clearInterval(this.intervalId);
+      this.el.classList.remove('running');
+      this.startBtn.disabled = false;
+      this.pauseBtn.disabled = true;
+    }
+
+    _reset() {
+      clearInterval(this.intervalId);
+      this.isRunning = false;
+      this.remainingSeconds = this.totalSeconds;
+      this.el.classList.remove('running', 'finished');
+      this.startBtn.disabled = false;
+      this.pauseBtn.disabled = true;
+      this._updateDisplay();
+    }
+
+    _finish() {
+      clearInterval(this.intervalId);
+      this.isRunning = false;
+      this.el.classList.remove('running');
+      this.el.classList.add('finished');
+      this.startBtn.disabled = false;
+      this.pauseBtn.disabled = true;
+
+      if (this.mode === 'focus') {
+        this.sessionCount++;
+        this.sessionCountEl.textContent = this.sessionCount;
+      }
+
+      try {
+        alarmSound.currentTime = 0;
+        alarmSound.play().catch(() => {});
+      } catch (e) {}
+
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(`${this.titleInput.value} - 시간 종료!`);
+      }
+
+      this.remainingSeconds = this.totalSeconds;
+      this._updateDisplay();
+    }
+
+    _updateDisplay() {
+      const m = Math.floor(this.remainingSeconds / 60);
+      const s = this.remainingSeconds % 60;
+      this.timeText.textContent =
+        `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+
+      const progress = this.remainingSeconds / this.totalSeconds;
+      const offset = CIRCLE_CIRCUMFERENCE * (1 - progress);
+      this.progressRing.style.strokeDashoffset = offset;
+    }
+
+    _destroy() {
+      clearInterval(this.intervalId);
+      this.el.remove();
+    }
+  }
+
+  function createTimer() {
+    timerCount++;
+    new PomodoroTimer(timerCount);
+  }
+
+  addBtn.addEventListener('click', createTimer);
+
+  // 브라우저 알림 권한 요청 (선택적)
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+
+  // 초기 타이머 2개 생성 (여러 개 타이머가 기본으로 보이도록)
+  createTimer();
+  createTimer();
+});
+
+</script>
 </body>
 </html>

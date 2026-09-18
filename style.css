@@ -1,21 +1,245 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  padding: 40px;
+  margin: 0;
+  font-family: "Segoe UI", "Malgun Gothic", sans-serif;
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  min-height: 100vh;
+  padding: 30px 20px;
 }
 
-#count {
-  font-size: 48px;
-  margin: 20px 0;
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
-button {
-  font-size: 18px;
-  margin: 5px;
-  padding: 10px 20px;
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.app-header h1 {
+  color: #4a2c2a;
+  font-size: 28px;
+  margin: 0;
+}
+
+.add-btn {
+  background: #e85d4d;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 15px;
   cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: transform 0.15s, background 0.2s;
 }
 
-button:hover {
-  background-color: #fd8a8a;
+.add-btn:hover {
+  background: #d64a3a;
+  transform: translateY(-2px);
+}
+
+.timer-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: flex-start;
+}
+
+.timer-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 22px;
+  width: 260px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transition: transform 0.2s;
+}
+
+.timer-card:hover {
+  transform: translateY(-3px);
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.timer-title {
+  flex: 1;
+  border: none;
+  background: #f7f2ef;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #4a2c2a;
+  outline: none;
+}
+
+.timer-title:focus {
+  background: #efe6e1;
+}
+
+.remove-btn {
+  border: none;
+  background: #f1f1f1;
+  color: #888;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.remove-btn:hover {
+  background: #ffdada;
+  color: #d33;
+}
+
+.mode-tabs {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.mode-btn {
+  flex: 1;
+  border: none;
+  background: #f2f2f2;
+  color: #666;
+  padding: 8px 4px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mode-btn.active {
+  background: #e85d4d;
+  color: #fff;
+  font-weight: 600;
+}
+
+.timer-display {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin-bottom: 18px;
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring__bg {
+  fill: none;
+  stroke: #f2e6e0;
+  stroke-width: 10;
+}
+
+.progress-ring__fg {
+  fill: none;
+  stroke: #e85d4d;
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 502.4;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.3s linear;
+}
+
+.time-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 180px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  font-weight: 700;
+  color: #4a2c2a;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.controls button {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+
+.start-btn {
+  background: #4caf7d;
+  color: #fff;
+}
+
+.pause-btn {
+  background: #f0ad4e;
+  color: #fff;
+}
+
+.reset-btn {
+  background: #e0e0e0;
+  color: #555;
+}
+
+.controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.session-info {
+  font-size: 13px;
+  color: #888;
+}
+
+.timer-card.running .progress-ring__fg {
+  stroke: #e85d4d;
+}
+
+.timer-card.short .progress-ring__fg,
+.timer-card.long .progress-ring__fg {
+  stroke: #4caf7d;
+}
+
+.timer-card.finished .time-text {
+  color: #e85d4d;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@media (max-width: 600px) {
+  .timer-card {
+    width: 100%;
+  }
 }
